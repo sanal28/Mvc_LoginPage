@@ -1,0 +1,231 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>ETL Center</title>
+    <script src="~/scripts/fontawesome-all.js"></script>
+    <link href="~/Styles/bootstrap.css" rel="stylesheet" />
+    <link href="~/Styles/ETLstyles.css" rel="stylesheet" />
+    <link href="~/Styles/CustomStyles.css" rel="stylesheet" />
+    <script src="~/scripts/fontawesomevv5.0.7.js"></script>
+    <script src="~/scripts/CustomScripts.js"></script>
+    <link href="~/Styles/fontsawesome.css" rel="stylesheet" />
+
+    <script src="~/scripts/Jquery-1.12.js"></script>
+    @*datepicker*@
+    <script src="~/scripts/jquery-ui.min.js"></script>
+    <link href="~/Styles/jquery-ui.css" rel="stylesheet" />
+    @*datepicker*@
+    <style>
+        @@import url('https://fonts.googleapis.com/css?family=Lato:400,700,900');
+    </style>
+   
+    @*<script src="~/scripts/jquery-1.10.2.js"></script>*@
+</head>
+<body>
+    
+   
+    <script type="text/javascript">
+       
+
+        $(document).ready(function () {
+            
+            $("#accid").click(function () {
+                $("#innersetting").show();
+            });
+
+            $("#menudivid").hover(function () {
+                $("#innersetting").hide();
+            });
+        
+            $("#ilRun").click(function () {
+                $('#ilRun').addClass("currentitem");
+                $('#liInfo').removeClass("currentitem");
+                $('#liReport').removeClass("currentitem");
+            });
+            $("#liInfo").click(function () {
+                $('#liInfo').addClass("currentitem");
+                $('#ilRun').removeClass("currentitem");
+                $('#liReport').removeClass("currentitem");
+            });
+            $("#liReport").click(function () {
+                $('#liReport').addClass("currentitem");
+                $('#ilRun').removeClass("currentitem");
+                $('#liInfo').removeClass("currentitem");
+
+            });
+            
+            if (@Convert.ToInt32( Session["IsAdmin"])== 0) {
+               
+                    
+                $('#listEmployee').remove();
+                $('#listpermission').remove();
+                $('#listAssignPermission').remove();
+                
+                
+            }
+           
+
+            $.ajax({
+                type: "POST",
+                url: "/Admin/DisplayProfileImage",
+                success: function (response) {
+                    var empImage = response.image
+                    if (empImage == "") {
+                        $('#userImage').html('<img src="../Images/blankImage.png"  />');
+                        $('#proImage').html('<img src="../Images/blankImage.png"  />');
+                    }
+                    else {
+                        $('#userImage').html('<img src="' + empImage + '" alt="" />');
+                        $('#proImage').html('<img src="' + empImage + '" alt="" />');
+
+                    }
+                },
+                failure: function (response) {
+
+                },
+                error: function (response) {
+
+                }
+            });
+
+            $("#divChangeimage").click(function () {
+                $('#imguploadprofile').trigger('click')
+            });
+           
+            
+
+            $('input[type=file]').change(function () {
+                var file = $("#imguploadprofile").get(0).files;
+                var formData = new FormData();
+                if (file.length > 0) {
+                    formData.append("newImage", file[0]);
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "/Admin/ChangeProfileImage",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        if (response.flag == true) {
+                            var imagePath = response.imgpath
+                            if (imagePath == "") {
+                                $('#userImage').html('<img src="../Images/blankImage.png" />');
+                                $('#proImage').html('<img src="../Images/blankImage.png"  />');
+                            }
+                            else {
+                                $('#userImage').html('<img src="' + imagePath + '" alt="" />');
+                                $('#proImage').html('<img src="' + imagePath + '" alt="" />');
+                            }
+                        }
+                    },
+                    failure: function (response) {
+
+                    },
+                    error: function (response) {
+
+                    }
+                });
+            });
+
+        });
+
+
+        function divhide() {
+            $("#innersetting").hide();
+          
+        }
+        function divheader() {
+
+  if (@Convert.ToInt32( Session["IsAdmin"])== 0) {
+               
+                    $('#divheaderlogo').click(location.href = '/Employee/EmployeeHome');
+                  
+            }
+            else {
+                $('#divheaderlogo').onclick(location.href = '/Admin/AdminHome');
+            }
+
+        }
+
+    </script>
+
+    <!-- my account div Js ends here -->
+    <header>
+        <div class="headerdiv">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="headerlogo" id="divheaderlogo" onclick="divheader();" style="cursor:pointer;"><img src="~/Images/etl-logo1.png" width="175" height="50" alt="" /></div>
+
+                    </div>
+                    <div class="col-md-9"> 
+                        <div id="outersettings" class="divouter">
+                            <div class="myaccounthover" value="Show Hide DIV" id="accid"><a href="#"><i class="fas fa-bars"></i></a></div>
+                            <div class="usershowdiv" id="innersetting" style="display:none;">
+                                <div id="triangle-up"></div>
+                                <div>
+                                    <div class="myaccountuserdiv">
+                                        <input type="hidden" id="hdnProPicFileVal" value="" />
+                                        <input type="file" id="imguploadprofile" accept="image/x-png, image/gif, image/jpeg,image/jpg" style="display:none" />
+                                        <div id="proImage"></div>
+                                        @*<div <img id="Changeimage" alt="" />*@
+                                        <div class="myaccountchangetext"><a href="#" id="divChangeimage">Change</a></div>
+                                    </div>
+                                    <div class="myaccountrightdiv">
+                                        <h4>@Session["EmployeeName"]</h4>
+                                        <p>@Session["EmployeeEmail"]</p>
+                                        <div class="signoutdiv"><a href='/Login/Logout'>Signout</a></div>
+
+                                    </div>
+
+                                </div>
+                                <div class="closediv" onclick="divhide()"><a href="#" >x</a></div>
+                            </div>
+                          
+                        </div>
+                        <div class="userimgdiv" id="userImage"></div>
+
+                        <div class="menumaindiv" id="menudivid">
+                            <ul>
+                                <li id="ilRun" onclick="location.href = '/PackageExecution/PackageExecution'">Run</li>
+                                <li id="liInfo">
+                                    Info <i class="fa fa-angle-down"></i>
+                                         <ul id="ulInfo">
+                                             <li id="listEmployee" onclick="location.href = '/Admin/AddEmployee'">Employee</li>
+                                             <li id="listEmilalert" onclick="location.href = '/Admin/EmailAlert'">Email Alert</li>
+                                             <li id="listPackageHome" onclick="location.href = '/Package/PackageHome'">Packages</li>
+                                             <li id="listPackageConnection" onclick="location.href = '/PackageConnection/PackageConnection'">Connection</li>
+                                             <li id="listTaskPrecedence" onclick="location.href = '/TaskPrecedence/TaskPrecedence'">Task Precedence</li>
+                                             <li id="listTaskSchedule" onclick="location.href = '/TaskSchedule/TaskSchedule'">Task Schedule</li>
+                                             <li id="listpermission" onclick="location.href = '/Permission/Permission'">Permission</li>
+                                             <li id="listAssignPermission" onclick="location.href = '/Permission/AssignPermission'">Assign Permission</li>
+                                             <li id="listaddcategory" onclick="location.href = '/AddCategory/AddCategory'">Add Category</li>
+                                             <li id="listgroup" onclick="location.href = '/Group/CreateGroup'">Group</li>
+                                         </ul>
+                                </li>
+                                <li id="liReport">
+                                    Report <i class="fa fa-angle-down"></i>
+                                           <ul>
+                                               <li id="listaggregatereport" onclick="location.href = '/ETLReport/Aggregate'">Aggregate Report</li>
+                                               <li id="listlogreport" onclick="location.href = '/ETLReport/Log'">Log Report</li>
+                                               <li id="listerrorreport" onclick="location.href = '/ETLReport/Error'">Error Report</li>
+                                               <li id="listpkgreport" onclick="location.href = '/ETLReport/PackageStatistics'">Package Statistics Report</li>
+
+                                           </ul>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="body-content">
+        @RenderBody()
+    </div>
+</body>
+</html>
