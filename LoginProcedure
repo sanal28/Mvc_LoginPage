@@ -1,0 +1,36 @@
+USE [SmartSheet]
+GO
+/****** Object:  StoredProcedure [dbo].[USPTblUserValidLogin]    Script Date: 7/30/2018 11:45:21 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+ALTER PROCEDURE [dbo].[USPTblUserValidLogin] 
+	@UserName nvarchar(50), 
+ @Password nvarchar(50) 
+AS
+BEGIN
+DECLARE @TrLgDescription varchar(8000),@userId int,@Updatedate datetime,@iSAdmin bit=0
+
+SET @Updatedate=CURRENT_TIMESTAMP ;
+select @userId=u.FK_CustomerDetails,@iSAdmin=u.IsAdmin  from VTwo.TblUsers u Where Rtrim(ltrim(u.TUUserEmail))=Rtrim(ltrim(@UserName))
+ AND Rtrim(ltrim(u.TUUserPassword)) =Rtrim(ltrim(@Password))
+	AND  u.TUClosedOn is Null
+if @userId>0 
+	BEGIN
+		--SELECT @ID_Employee as ID,'LoginSuccedded' as LogDescription,@EmpISAdmin As EmpISAdmin
+		SET @TrLgDescription=concat('Log in Succedded for Employee ID',@UserName, convert(varchar(30),GETDATE(),121))
+		SELECT @userId as ID,'LoginSuccedded' as LogDescription,@iSAdmin As EmpISAdmin,u.TUUserEmail as UserName
+		FROM VTwo.TblUsers u WHERE u.TUUserEmail=@UserName
+	END
+else
+	BEGIN
+		SELECT 0 as ID,'Loginfailed' as LogDescription,@iSAdmin As EmpISAdmin,0 as UserName
+		SET @TrLgDescription=concat('Log in failed for Employee ID',@UserName, convert(varchar(30),GETDATE(),121))
+	END
+	END
