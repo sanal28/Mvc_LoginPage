@@ -1,0 +1,416 @@
+@{
+    ViewBag.Title = "Home";
+    Layout = "~/Shared/_AdminMaster.cshtml";
+}
+
+    <script type="text/javascript">
+        $('#liRegistration').addClass("currentitem");
+        $(document).ready(function () {
+            $(document).mouseup(function (e) {
+                $("#innersetting").hide();
+            });
+            $("#liRegistration").click(function () {
+                $('#liRegistration').addClass("currentitem");
+                $('#liUpload').removeClass("currentitem");
+                $('#lishiftDetails').removeClass("currentitem");
+                $('#liJobscheduling').removeClass("currentitem");
+            });
+                $("#btnupdate").hide();
+                $("#btnaddNew").hide();
+                $("#btndelete").hide();
+                loadCustomerDetails();
+                //LoadDdls('/Registration/GetTeamName', $('#ddlteam'), 'ID_VueTeam', 'Team');
+                //LoadDdls('/Registration/GetUserName', $('#ddlUserName'), 'UserID', 'UserName');
+            
+                $("#txtfirstname").click(function () {
+                    $("#divfirstname").removeClass("ErrorFocus");
+                    $("#pvalidateMessage").text("");
+                });
+                $("#txtmiddlename").click(function () {
+                    $("#divmiddlename").removeClass("ErrorFocus");
+                    $("#pvalidateMessage").text("");
+                });
+                $("#txtlastname").click(function () {
+                    $("#divlastname").removeClass("ErrorFocus");
+                    $("#pvalidateMessage").text("");
+                });
+                $("#txtexcelname").click(function () {
+                    $("#divexcelname").removeClass("ErrorFocus");
+                    $("#pvalidateMessage").text("");
+                });
+                //$("#ddlteam").click(function () {
+                //    $("#divddlteam").removeClass("ErrorFocus");
+                //    $("#pvalidateMessage").text("");
+                //});
+                //$("#ddlUserName").click(function () {
+                //    $("#divddlUserName").removeClass("ErrorFocus");
+                //    $("#pvalidateMessage").text("");
+                //});
+                $("#txtEmailId").click(function () {
+                    $("#divEmailId").removeClass("ErrorFocus");
+                    $('#pvalidateMessage').text('');
+
+                });
+                $("#txtPassword").click(function () {
+                    $("#divPassword").removeClass("ErrorFocus");
+                    $('#pvalidateMessage').text('');
+
+                });
+                $("#txtReTypePassword").click(function () {
+                    $("#divReTypePassword").removeClass("ErrorFocus");
+                    $('#pvalidateMessage').text('');
+
+                });
+                $('#btnsubmit').click(function () {
+                    var firstname=$("#txtfirstname").val();
+                    var middleName = $("#txtmiddlename").val();
+                    var lastName = $("#txtlastname").val();
+                    var ecxelName = $("#txtexcelname").val();
+                    var password = $("#txtPassword").val();
+                    var reTypePassword = $("#txtReTypePassword").val();
+                    var emailid = $("#txtEmailId").val();
+                    if (Validate("EmployeeReg")) {
+                        $.ajax({
+                            type: "POST",
+                            url: "/Registration/EmployeeReg",
+                            data: { Firstname: firstname, MiddleName: middleName, LastName: lastName, ExcelName: ecxelName, passWord: password, emailId: emailid },
+                            success: function (response) {
+                                if (response.flag == -2) {
+                                    $("#pvalidateMessage").text("some error occurs");
+
+                                }
+                                else {
+                                    $("#pvalidateMessage").text("Registration successfully completed");
+                             
+                                    $('#txtfirstname').removeData('empDetailsId');
+                                    loadCustomerDetails();
+                                    $("#txtfirstname").val("");
+                                    $("#txtmiddlename").val("");
+                                    $("#txtlastname").val("");
+                                    $("#txtexcelname").val("");
+                                    $("#ddlteam").val("");
+                                    $("#txtEmailId").val("");
+                                    $("#txtPassword").val("");
+                                    $("#txtReTypePassword").val("");
+                                    $("#ddlUserName").val("");
+                                   
+                                }
+
+
+                            },
+                            failure: function (response) {
+
+                            },
+                            error: function (response) {
+
+                            }
+                        });
+                    }
+                });
+
+                $("#btncancel").click(function () {
+                    //  $("#btnupdate").hide();
+                    $("#txtfirstname").val("");
+                    $("#txtmiddlename").val("");
+                    $("#txtlastname").val("");
+                    $("#txtexcelname").val("");
+                    $("#ddlteam").val("");
+                    $("#ddlUserName").val("");
+                    $("#pvalidateMessage").text("");
+                    $("#txtEmailId").val("");
+                    $("#txtReTypePassword").val("");
+                    $("#txtReTypePassword").val("");
+                    $("#divEmailId").removeClass("ErrorFocus");
+                    $("#divPassword").removeClass("ErrorFocus");
+                    $("#divReTypePassword").removeClass("ErrorFocus");
+                    $("#divfirstname").removeClass("ErrorFocus");
+                    $("#divmiddlename").removeClass("ErrorFocus");
+                    $("#divlastname").removeClass("ErrorFocus");
+                    $("#divexcelname").removeClass("ErrorFocus");
+                    $("#divddlUserName").removeClass("ErrorFocus");
+                    $("#divddlteam").removeClass("ErrorFocus");
+                    $('#txtfirstname').removeData('empDetailsId');
+                });
+
+
+                $("#btnaddNew").click(function () {
+                    $("#txtfirstname").val("");
+                    $("#txtmiddlename").val("");
+                    $("#txtlastname").val("");
+                    $("#txtexcelname").val("");
+                    $("#ddlteam").val("");
+                    $("#ddlUserName").val("");
+                    $("#txtEmailId").val("");
+                    $("#txtReTypePassword").val("");
+                    $("#txtReTypePassword").val("");
+                    $("#divEmailId").removeClass("ErrorFocus");
+                    $("#divPassword").removeClass("ErrorFocus");
+                    $("#divReTypePassword").removeClass("ErrorFocus");
+                    $("#divfirstname").removeClass("ErrorFocus");
+                    $("#divmiddlename").removeClass("ErrorFocus");
+                    $("#divlastname").removeClass("ErrorFocus");
+                    $("#divexcelname").removeClass("ErrorFocus");
+                    $("#divddlteam").removeClass("ErrorFocus");
+                    $('#btnupdate').hide();
+                    $('#btndelete').hide();
+                    $('#btnaddNew').hide();
+                    $('#btnsubmit').show();
+                    $('#btncancel').show();
+                    $("#txtEmailId").prop('disabled', false);
+
+                    $("#divOuterRePassword").show();
+                    $("#divOuterPassword").show();
+                    $("#pvalidateMessage").text("");
+                });
+
+                $("#btnupdate").click(function () {
+                    if ($('#txtfirstname').data("empDetailsId") !== undefined) {
+                        var employeeId = $('#txtfirstname').data('empDetailsId');
+                        var firstname = $("#txtfirstname").val();
+                        var middleName = $("#txtmiddlename").val();
+                        var lastName = $("#txtlastname").val();
+                        var ecxelName = $("#txtexcelname").val();
+                        if (Validate("EmployeeUpdate")) {
+                            $.ajax({
+                                type: "POST",
+                                url: "/Registration/UpdateEmployeeReg",
+                                data: { EmployeeId: employeeId, Firstname: firstname, MiddleName: middleName, LastName: lastName, ExcelName: ecxelName },
+                                success: function (response) {
+                                    if (response.flag == -2) {
+                                        $("#pvalidateMessage").text("some error occurs");
+
+                                    }
+                                    else {
+                                        $("#pvalidateMessage").text("Updated successfully");
+                               
+                                        loadCustomerDetails();
+                                        $("#txtfirstname").val("");
+                                        $("#txtmiddlename").val("");
+                                        $("#txtlastname").val("");
+                                        $("#txtexcelname").val("");
+                                        $("#ddlteam").val("");
+                                        $("#ddlUserName").val("");
+                                        $("#txtEmailId").val("");
+                                    }
+
+
+                                },
+                                failure: function (response) {
+
+                                },
+                                error: function (response) {
+
+                                }
+                            });
+                        }
+
+
+                    }
+                });
+                $("#btndelete").click(function () {
+                    if ($('#txtfirstname').data("empDetailsId") !== undefined) {
+                        var employeeId = $('#txtfirstname').data('empDetailsId');
+
+                        $.ajax({
+                            type: "POST",
+                            url: "/Registration/DeleteEmployeeReg",
+                            data: { EmployeeId: employeeId, },
+                            success: function (response) {
+                                if (response.flag == -2) {
+                                    $("#pvalidateMessage").text("some error occurs");
+                                }
+                                else {
+                                    $("#pvalidateMessage").text("Deleted successfully");
+
+                                    loadCustomerDetails();
+                                    $("#txtfirstname").val("");
+                                    $("#txtmiddlename").val("");
+                                    $("#txtlastname").val("");
+                                    $("#txtexcelname").val("");
+                                    $("#txtEmailId").val("");
+                                    //$("#ddlteam").val("");
+                                    //$("#ddlUserName").val("");
+
+
+                                }
+
+
+                            },
+                            failure: function (response) {
+
+                            },
+                            error: function (response) {
+
+                            }
+                        });
+
+
+
+                    }
+                });
+            });
+
+            function loadCustomerDetails() {
+          
+                $.ajax({
+                    type: "POST",
+                    url: "/Registration/EmpDetailsFirstLoad",
+                    success: function (response) {
+                        var empDetailsList   = $.parseJSON(response);
+
+                        $('#tblcustomerdetails > tbody').children("tr:gt(0)").remove();
+                        if (empDetailsList  ["Result"] == undefined || empDetailsList  ["Result"] == null) {
+                       
+                            var swapRowStyle = true;
+                            for (i = 0; i < empDetailsList.length; i++) {
+                         
+                                if (swapRowStyle) {
+                                    $('#tblcustomerdetails').append("<tr><td class='gridsubdes'><a href='#' onclick='LoadEmpDetails(" + empDetailsList[i].ID_CustomerDetails + ",\"" + empDetailsList[i].CusFirstName + "\",\"" + empDetailsList[i].CusMiddleName + "\",\"" + empDetailsList[i].CusLastName + "\",\"" + empDetailsList[i].CusExcelName + "\",\"" + empDetailsList[i].TUUserEmail + "\");'>" + empDetailsList[i].CusFirstName +
+                                        "</a></td><td class='gridsubdes'>" + empDetailsList[i].CusMiddleName + "</td><td class='gridsubdes'>" + empDetailsList[i].CusLastName +
+                                        "</td><td class='gridsubdes'>" + empDetailsList[i].CusExcelName + "</td><td class='gridsubdes'>" + empDetailsList[i].TUUserEmail + "</td></tr>");
+                                    swapRowStyle = false;
+
+                                }
+
+                                else {
+                                    $('#tblcustomerdetails').append("<tr><td class='gridsubdes1'><a href='#' onclick='LoadEmpDetails(" + empDetailsList[i].ID_CustomerDetails + ",\"" + empDetailsList[i].CusFirstName + "\",\"" + empDetailsList[i].CusMiddleName + "\",\"" + empDetailsList[i].CusLastName + "\",\"" + empDetailsList[i].CusExcelName + "\",\"" + empDetailsList[i].TUUserEmail + "\");'>" + empDetailsList[i].CusFirstName +
+                                         "</a></td><td class='gridsubdes1'>" + empDetailsList[i].CusMiddleName + "</td><td class='gridsubdes1'>" + empDetailsList[i].CusLastName +
+                                         "</td><td class='gridsubdes1'>" + empDetailsList[i].CusExcelName + "</td><td class='gridsubdes1'>" + empDetailsList[i].TUUserEmail + "</td></tr>");
+                                    swapRowStyle = true;
+                                }
+                            }
+
+                        }
+                        else {
+                     
+                            $('#tblcustomerdetails').append("<tr><td colspan='5' class='gridsubdes'>No Records Found</td></tr>");
+                        }
+                        preventDefaultClick();
+                    },
+                    failure: function (response) {
+                    },
+                    error: function (response) {
+                    }
+
+                });
+            }
+
+            function preventDefaultClick() {
+                $('.hreflink').click(function (e) {
+                    e.preventDefault();//prevent default click
+                });
+            }
+            function LoadEmpDetails(EmpId,fName,mName,lName,eName,email)
+            {
+
+                $("#divEmailId").removeClass("ErrorFocus");
+                $("#divPassword").removeClass("ErrorFocus");
+                $("#divReTypePassword").removeClass("ErrorFocus");
+                $("#divfirstname").removeClass("ErrorFocus");
+                $("#divmiddlename").removeClass("ErrorFocus");
+                $("#divlastname").removeClass("ErrorFocus");
+                $("#divexcelname").removeClass("ErrorFocus");
+                $("#divddlteam").removeClass("ErrorFocus");
+                $("#txtEmailId").val(email);
+                $("#txtEmailId").prop('disabled', true);
+
+                $("#divOuterRePassword").hide();
+                $("#divOuterPassword").hide();
+                $("#txtfirstname").val(fName);
+                $("#txtmiddlename").val(mName);
+                $("#txtlastname").val(lName);
+                $("#txtexcelname").val(eName);
+                //$("#ddlteam").val(TeamId);
+                //$("#ddlUserName").val(userid);
+                $('#btnupdate').show();
+                $('#btndelete').show();
+                $('#btnaddNew').show();
+                $('#btnsubmit').hide();
+                $('#btncancel').hide();
+                $("#pvalidateMessage").text("");
+                $('#txtfirstname').data('empDetailsId', EmpId);
+            }
+        
+        </script>
+    <div class="container">
+        <div class="calcontentmaindiv">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="callabel" >Full Name</div>
+                    <div class="inputtextdiv" id="divfirstname"><input class="calentextbox" type="text" id="txtfirstname"></div>
+                </div>
+                <div class="col-md-4">
+                    <div class="callabel">Middle Name</div>
+                    <div class="inputtextdiv" id="divmiddlename"><input class="calentextbox" type="text" id="txtmiddlename"></div>
+                </div>
+                <div class="col-md-4">
+                    <div class="callabel">Last Name</div>
+                    <div class="inputtextdiv" id="divlastname"><input class="calentextbox" type="text" id="txtlastname"></div>
+                </div>
+                <div class="col-md-4">
+                    <div class="callabel">Excel Name</div>
+                    <div class="inputtextdiv" id="divexcelname"><input class="calentextbox" type="text" id="txtexcelname"></div>
+                </div>
+                <div class="col-md-4">
+                    <div class="callabel">Email Id</div>
+                    <div class="inputtextdiv" id="divEmailId"><input class="calentextbox" type="text" id="txtEmailId"></div>
+                </div>
+                <div class="col-md-4" id="divOuterPassword">
+                    <div class="callabel">Password</div>
+                    <div class="inputtextdiv" id="divPassword"><input class="calentextbox" type="Password" id="txtPassword"></div>
+                </div>
+                <div class="col-md-4" id="divOuterRePassword">
+                    <div class="callabel">Re-Type Password</div>
+                    <div class="inputtextdiv" id="divReTypePassword"><input class="calentextbox" type="Password" id="txtReTypePassword"></div>
+                </div>
+                @*<div class="col-md-4">
+                    <div class="callabel">Team</div>
+                    <div class="inputtextdiv" id="divddlteam">
+                        <select class="calentextbox" id="ddlteam" onclick="this.setAttribute('value', this.value);">
+                            <option value="">Please choose..</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="callabel">UserName</div>
+                    <div class="inputtextdiv" id="divddlUserName">
+                        <select class="calentextbox" id="ddlUserName" onclick="this.setAttribute('value', this.value);">
+                            <option value="">Please choose..</option>
+                        </select>
+                    </div>
+                </div>*@
+                    <div class="col-md-12">
+                        <div class="sspace"></div>
+                        <div class="btnmaindiv">
+                            <p id="pvalidateMessage"></p>
+                            <button class="cancelbtn" id="btncancel">Cancel</button>
+                            <button class="submitbtn" id="btnsubmit">Submit</button>
+                            <button class="updatebtn" id="btnaddNew">Add New</button>
+                            <button class="updatebtn" id="btnupdate">Update</button>
+                            <button class="updatebtn" id="btndelete">Delete</button>
+                           
+
+                        </div>
+
+                    </div>
+                </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="SSgridmaindiv">
+            
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" id="tblcustomerdetails">
+                <tbody>
+                    <tr>
+                        <td class="gridheader">First Name</td>
+                        <td class="gridheader">Middle Name</td>
+                        <td class="gridheader">Last Name</td>
+                        <td class="gridheader">Excel Name</td>
+                        <td class="gridheader">Email ID</td>
+                    </tr>
+                   
+                </tbody>
+            </table>
+        </div>
+    </div>
+
