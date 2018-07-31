@@ -1,0 +1,64 @@
+USE [SmartSheet]
+GO
+/****** Object:  StoredProcedure [VTwo].[USPTblCustomerDetailsUpdate]    Script Date: 7/31/2018 9:02:18 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+
+ALTER PROCEDURE [VTwo].[USPTblCustomerDetailsUpdate]
+	-- Add the parameters for the stored procedure here[]
+	@ID_CustomerDetails int,
+	@CustFirstName varchar(50),
+	@CustMiddleName varchar(50),
+	@CustLastName varchar(50),
+	@CustExcelName varchar(50),
+	@ISDeleted bit,
+	@EnteredBy int,
+	@ID_TblUsers int,
+	@TUUserEmail varchar(50),
+	@TUUserPassword varchar(50),
+	@TUClosedOn datetime,
+	@Action Tinyint
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from[ISDeleted]
+	-- interfering with SELECT statements.
+	
+
+    IF @Action =1
+BEGIN
+		BEGIN TRAN
+			INSERT INTO [VTwo].[TblCustomerDetails](CusFirstName, CusMiddleName, CusLastName, CusExcelName,ISDeleted,EnteredDateTime, EntertedBy)
+			values(@CustFirstName,@CustMiddleName,@CustLastName,@CustExcelName,@ISDeleted,getdate(),@EnteredBy)	
+			INSERT INTO [VTwo].[TblUsers](FK_CustomerDetails, TUUserEmail,TUUserPassword,TUClosedOn, EnteredDateTime, EntertedBy)
+			values(SCOPE_IDENTITY(),@TUUserEmail,@TUUserPassword,@TUClosedOn,getdate(),@EnteredBy)
+		COMMIT TRAN	
+END
+
+IF @Action =2
+BEGIN
+		BEGIN TRAN
+
+		Update [VTwo].[TblCustomerDetails] set CusFirstName=@CustFirstName,CusMiddleName=@CustMiddleName,CusLastName=@CustLastName,CusExcelName=@CustExcelName,
+		EnteredDateTime=getdate(),EntertedBy=@EnteredBy where  ID_CustomerDetails=@ID_CustomerDetails
+		
+		COMMIT TRAN	
+END
+IF @Action =3
+BEGIN
+		BEGIN TRAN
+
+		Update [VTwo].[TblCustomerDetails] set ISDeleted=1,EnteredDateTime=getdate(),EntertedBy=@EnteredBy where  ID_CustomerDetails=@ID_CustomerDetails
+		Update  [VTwo].[TblUsers] set TUClosedOn=getdate(),EnteredDateTime=getdate(),EntertedBy=@EnteredBy where  FK_CustomerDetails=@ID_CustomerDetails
+		
+		COMMIT TRAN	
+END
+END
+
