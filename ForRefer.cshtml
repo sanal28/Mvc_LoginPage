@@ -1,0 +1,443 @@
+
+@{
+    ViewBag.Title = "Log";
+    Layout = "~/Views/Shared/_AdminMaster.cshtml";
+}
+<script type="text/javascript">
+
+    var CurrenterrorPageId = 1;
+    var RowCount = 15;
+    var OffsetVal = 1;
+    var ClassName = "";
+    var loopVal = 0;
+    var classId = 0;
+    var PageCountError = 0;
+    $('#liReport').addClass("currentitem");
+    $(document).ready(function () {
+        $('#tbllogReport').append("<tr><td colspan='11' class='gridrow1'>No Records Found</td></tr>");
+        $(document).mouseup(function (e) {
+            $("#innersetting").hide();
+        });
+        LoadDdls('/Admin/GetGroupList', $('#ddlPackageroup'), 'Run_Id', 'Run_Name');
+        LoadDdls('/PackageConnection/GetPackageList', $('#ddlPackageName'), 'Package_id', 'Package_Name');
+        LoadDdls('/ETLReport/GetPackgestatus', $('#ddlPackageStaus'), 'CodeID', 'CodeDesc');
+        $("#listlogreport").click(function () {
+            $('#liInfo').removeClass("currentitem");
+            $('#ilRun').removeClass("currentitem");
+            $('#liReport').addClass("currentitem");
+
+        });
+        $("#dtStartDate").prop('disabled', true);
+        $("#dtEndDate").prop('disabled', true);
+        $("#chkActive").click(function (){
+            var checkBoxActive = $('#chkActive').is(':checked');
+            if (checkBoxActive == true)
+            {
+                $("#dtStartDate").prop('disabled', false);
+                $("#dtEndDate").prop('disabled', false);
+            }
+            else
+            {
+                $("#dtStartDate").prop('disabled', true);
+                $("#dtEndDate").prop('disabled', true);
+            }
+        });
+
+        $("#ddlPackageroup").click(function () {
+            $("#divPackageroup").removeClass("ErrorFocus");
+            $('#pLogreport').text("");
+        });
+        $("#ddlPackageName").click(function () {
+            $("#divPackageName").removeClass("ErrorFocus");
+            $('#pLogreport').text("");
+        });
+        $("#ddlPackageStaus").click(function () {
+            $("#divPackageStatus").removeClass("ErrorFocus");
+            $('#pLogreport').text("");
+        });
+        $("#dtStartDate").click(function () {
+            $("#divStartDate").removeClass("ErrorFocus");
+            $('#pLogreport').text("");
+        });
+        $("#dtEndDate").click(function () {
+            $("#divEndDate").removeClass("ErrorFocus");
+            $('#pLogreport').text("");
+        });
+        $("#dtEndDate").datepicker({
+            dateFormat: 'mm/dd/yy',
+            changeMonth: true,
+            changeYear: true,
+            yearRange: '1900:2100',
+             onSelect: function (d, i) {
+                if (d !== i.lastVal) {
+
+                }
+            }
+        });
+        $("#dtStartDate").datepicker({
+            dateFormat: 'mm/dd/yy',
+            changeMonth: true,
+            changeYear: true,
+            yearRange: '1900:2100',
+            onSelect: function (d, i) {
+                if (d !== i.lastVal) {
+
+                }
+            }
+        });
+        $("#btnSubmit").click(function () {
+             @{ 
+                 Session["groupid"] = null;
+                 Session["pkgid"] = null;
+                 Session["logpkgstatus"] = null;
+                 Session["startdate"] = null;
+                 Session["enddate"] = null;
+                }
+            //CurrenterrorPageId = 1;
+            OffsetVal = 0;
+            CurrenterrorPageId = 1;
+            FirstButonClick($('.paginationNUMOpenbtn'), $('.pgNumber1'), 'paginationNUM-ACTVbtn', CurrenterrorPageId, 'paginationNUMMOREtxt-Active', 'paginationNUMMOREtxt1-Active');
+            var packageGroup = $("#ddlPackageroup option:selected").val();
+            var packageName = $("#ddlPackageName option:selected").val();
+            var packageStatus = $("#ddlPackageStaus option:selected").val();
+            var startDate = $("#dtStartDate").val();
+            var EndDate = $("#dtEndDate").val();
+            localStorage.setItem("GroupId", packageGroup);
+            localStorage.setItem("PackageId", packageName);
+            localStorage.setItem("packageStatusId", packageStatus);
+            localStorage.setItem("StartDate", startDate);
+            localStorage.setItem("EndDate", EndDate);
+            OffsetVal = ((CurrenterrorPageId - 1) * RowCount);
+            if (Validate("logreport")) {
+               
+                $.ajax({
+                    type: "POST",
+                    url: "/ETLReport/GetLogReport",
+                    data: { PackageGroup: packageGroup, packageName: packageName, packageStatus: packageStatus, startDate: startDate, EndDate: EndDate, PageNo: OffsetVal, RowCount: RowCount },
+                    success: function (response) {
+                        if (response.flag == false) {
+
+                           
+                        }
+                        else {
+                            var LogReportDetails = $.parseJSON(response);
+                         
+                            BindlogReport(LogReportDetails);
+                            $('#ddlPackageroup').val(0);
+                            $('#ddlPackageName').val(0);
+                            $("#ddlPackageStaus").val(0);
+                            $("#dtStartDate").val("");
+                            $("#dtEndDate").val("");
+                            $("#divPackageName").removeClass("ErrorFocus");
+                             $("#divPackageroup").removeClass("ErrorFocus");
+
+
+                        }
+                    },
+                    failure: function (response) {
+                    },
+                    error: function (response) {
+                    }
+                });
+
+            }
+        });
+        $("#btnundo").click(function () {
+             @{ 
+                 Session["groupid"] = null;
+                 Session["pkgid"] = null;
+                 Session["logpkgstatus"] = null;
+                 Session["startdate"] = null;
+                 Session["enddate"] = null;
+                }
+            window.localStorage.clear();
+            OffsetVal = 0;
+            CurrenterrorPageId = 1;
+            window.location.reload(true);
+            $('#ddlPackageroup').val(0);
+            $('#ddlPackageName').val(0);
+            $("#ddlPackageStaus").val(0);
+            $("#dtStartDate").prop('disabled', true);
+            $("#dtEndDate").prop('disabled', true);
+            $("#dtStartDate").val("");
+            $("#dtEndDate").val("");
+            $('#chkActive').prop('checked', false);
+            $("#divPackageroup").removeClass("ErrorFocus");
+            $("#divPackageName").removeClass("ErrorFocus");
+            $("#divPackageStatus").removeClass("ErrorFocus");
+            $("#divStartDate").removeClass("ErrorFocus");
+            $("#divEndDate").removeClass("ErrorFocus");
+            $('#pLogreport').text('');
+            $('#tbllogReport > tbody').children("tr:gt(0)").remove();
+            $('#tbllogReport').append("<tr><td colspan='11' class='gridrow1'>No Records Found</td></tr>");
+            $("#divEmailAlertPage").hide();
+        });
+
+        $('.paginationbtndivNum > a').each(function () {
+            $(this).click(function () {
+
+                classId = parseInt($(this).find('.paginationNUMOpenbtn').attr("name"));
+                CurrenterrorPageId = parseInt($(this).find('.paginationNUMOpenbtn').text());
+                loopVal = parseInt($(this).find('.paginationNUMOpenbtn').text());
+                LoadEachButton($('.paginationNUMOpenbtn'), '.pgNumber', 'paginationNUM-ACTVbtn', 'paginationNUMMOREtxt-Active', 'paginationNUMMOREtxt1-Active', PageCountError);
+                loadlogDetails();
+                disableButtons($('#LSTbtn'), $('#NXTbtn'), $('#FRSTbtn'), $('#PRVbtn'), PageCountError, loopVal);
+            });
+        });
+        $("#NXTbtn").click(function () {
+            CurrenterrorPageId = CurrenterrorPageId + 1;
+            getLoopValAndClassId($('.paginationNUM-ACTVbtn'), $('.paginationNUMMOREtxt-Active'), $('.paginationNUMMOREtxt1-Active'));
+            NextButtonClick($('.paginationNUMOpenbtn'), $('.pgNumber' + classId), $('.pgNumber' + (classId + 1)), 'paginationNUM-ACTVbtn',
+                PageCountError, 'paginationNUMMOREtxt-Active', 'paginationNUMMOREtxt1-Active');
+            disableButtons($('#LSTbtn'), $('#NXTbtn'), $('#FRSTbtn'), $('#PRVbtn'), PageCountError, CurrenterrorPageId);
+            loadlogDetails();
+        });
+
+        $("#PRVbtn").click(function () {
+            CurrenterrorPageId = CurrenterrorPageId - 1;
+            getLoopValAndClassId($('.paginationNUM-ACTVbtn'), $('.paginationNUMMOREtxt-Active'), $('.paginationNUMMOREtxt1-Active'));
+            prevButtonClick($('.paginationNUMOpenbtn'), $('.pgNumber' + (classId - 1)), $('.pgNumber' + classId), 'paginationNUM-ACTVbtn',
+                'paginationNUMMOREtxt-Active', 'paginationNUMMOREtxt1-Active', CurrenterrorPageId);
+            disableButtons($('#LSTbtn'), $('#NXTbtn'), $('#FRSTbtn'), $('#PRVbtn'), PageCountError, CurrenterrorPageId, $('.paginationNUM-ACTVbtn'));
+            loadlogDetails();
+        });
+        $("#FRSTbtn").click(function () {
+            CurrenterrorPageId = 1;
+            FirstButonClick($('.paginationNUMOpenbtn'), $('.pgNumber1'), 'paginationNUM-ACTVbtn', CurrenterrorPageId, 'paginationNUMMOREtxt-Active', 'paginationNUMMOREtxt1-Active');
+            disableButtons($('#LSTbtn'), $('#NXTbtn'), $('#FRSTbtn'), $('#PRVbtn'), PageCountError, CurrenterrorPageId, $('.paginationNUM-ACTVbtn'));
+            loadlogDetails();
+        });
+        $("#LSTbtn").click(function () {
+            CurrenterrorPageId = PageCountError;
+            LastButtonClick($('.paginationNUMOpenbtn'), $('.pgNumber5'), $('.pgNumber' + CurrenterrorPageId), 'paginationNUM-ACTVbtn', CurrenterrorPageId,
+                'paginationNUMMOREtxt-Active', 'paginationNUMMOREtxt1-Active');
+            disableButtons($('#LSTbtn'), $('#NXTbtn'), $('#FRSTbtn'), $('#PRVbtn'), PageCountError, CurrenterrorPageId);
+            loadlogDetails();
+        });
+
+    });
+  
+   
+    function BindlogReport(LogReportDetails) {
+        $('#tbllogReport > tbody').children("tr:gt(0)").remove();
+        if (LogReportDetails["Result"] == undefined || LogReportDetails["Result"] == null)
+        {
+          
+            if (LogReportDetails[0]["TotalRowCount"] % 15 == 0)
+                PageCountError = LogReportDetails[0]["TotalRowCount"] / 15;
+            else
+                PageCountError = Math.floor(LogReportDetails[0]["TotalRowCount"] / 15) + 1;
+            disableButtons($('#LSTbtn'), $('#NXTbtn'), $('#FRSTbtn'), $('#PRVbtn'), PageCountError, CurrenterrorPageId);
+            showAndHidePages(PageCountError, CurrenterrorPageId, $('.paginationbtndivNum > a'), '.pgNumber');
+            var swapRowStyle = true;
+            for (i = 0; i < LogReportDetails.length; i++)
+            {
+                if (!LogReportDetails[i].hasOwnProperty('Package')) {
+                    $("#trpackage").hide();
+                    $("#trexeorder").hide();
+                    $("#trpretask").hide();
+                    $("#rowpro").hide();
+                    $("#trassigned").hide();
+
+                    $("#trGroup").show();
+                    if (swapRowStyle) {
+                        $('#tbllogReport').append("<tr><td class='gridrow1'>" + LogReportDetails[i]["Run ID"] + "</td><td class='gridrow1'>"
+                            + LogReportDetails[i]["Group"] + "</td><td class='gridrow1'>" + LogReportDetails[i]["Status"] + "</td><td class='gridrow1'>" + LogReportDetails[i]["Start Time"] + "</td><td class='gridrow1'>"
+                            + LogReportDetails[i]["End Time"] + "</td><td class='gridrow1'>" + LogReportDetails[i]["Cycle Time"] + "</td></tr>");
+                        swapRowStyle = false;
+
+                    }
+                    else {
+                        $('#tbllogReport').append("<tr><td class='gridrow2'>" + LogReportDetails[i]["Run ID"] + "</td><td class='gridrow2'>"
+                            + LogReportDetails[i]["Group"] + "</td><td class='gridrow2'>" + LogReportDetails[i]["Status"] + "</td><td class='gridrow2'>" + LogReportDetails[i]["Start Time"] + "</td><td class='gridrow2'>"
+                            + LogReportDetails[i]["End Time"] + "</td><td class='gridrow2'>" + LogReportDetails[i]["Cycle Time"] + "</td></tr>");
+
+                        swapRowStyle = true;
+                    }
+
+                }
+                else {
+                    $("#trGroup").hide();
+                    $("#trpackage").show();
+                    $("#trexeorder").show();
+                    $("#trpretask").show();
+                    $("#rowpro").show();
+                    $("#trassigned").show();
+                    $("#trGroup").hide();
+                    if (swapRowStyle) {
+                        $('#tbllogReport').append("<tr><td class='gridrow1'>" + LogReportDetails[i]["Run ID"] + "</td><td class='gridrow1'>"
+                            + LogReportDetails[i]["Package"] + "</td><td class='gridrow1'>" + LogReportDetails[i]["Status"] + "</td><td class='gridrow1'>"
+                            + LogReportDetails[i]["Assigned To"] + "</td><td class='gridrow1'>" + LogReportDetails[i]["Start Time"] + "</td><td class='gridrow1'>"
+                            + LogReportDetails[i]["End Time"] + "</td><td class='gridrow1'>" + LogReportDetails[i]["Cycle Time"] + "</td><td class='gridrow1'>"
+                            + LogReportDetails[i]["Execution Order"] + "</td><td class='gridrow1'>" + LogReportDetails[i]["Precedent Task ID"] + "</td><td class='gridrow1'>"
+                            + LogReportDetails[i]["Rows Processed"] + "</td></tr>");
+                        swapRowStyle = false;
+
+                    }
+                    else {
+                        $('#tbllogReport').append("<tr><td class='gridrow2'>" + LogReportDetails[i]["Run ID"] + "</td><td class='gridrow2'>"
+                            + LogReportDetails[i]["Package"] + "</td><td class='gridrow2'>" + LogReportDetails[i]["Status"] + "</td><td class='gridrow2'>"
+                            + LogReportDetails[i]["Assigned To"] + "</td><td class='gridrow2'>" + LogReportDetails[i]["Start Time"] + "</td><td class='gridrow2'>"
+                            + LogReportDetails[i]["End Time"] + "</td><td class='gridrow2'>" + LogReportDetails[i]["Cycle Time"] + "</td><td class='gridrow2'>"
+                            + LogReportDetails[i]["Execution Order"] + "</td><td class='gridrow2'>" + LogReportDetails[i]["Precedent Task ID"] + "</td><td class='gridrow2'>"
+                            + LogReportDetails[i]["Rows Processed"] + "</td></tr>");
+
+                        swapRowStyle = true;
+                    }
+                }
+            }
+            $("#divEmailAlertPage").show();
+        }
+        else {
+            $("#divEmailAlertPage").hide();
+            $('#tbllogReport').append("<tr><td colspan='11' class='gridrow1'>No Records Found</td></tr>");
+        }
+
+
+    }
+
+    function loadlogDetails() {
+        var packageGroup = localStorage.getItem("GroupId");
+        var packageName = localStorage.getItem("PackageId");
+        var packageStatus = localStorage.getItem("packageStatusId");
+        var startDate = localStorage.getItem("StartDate");
+        var EndDate = localStorage.getItem("EndDate");
+        //CurrenterrorPageId = 1;
+        OffsetVal = ((CurrenterrorPageId - 1) * RowCount);
+        $.ajax({
+            type: "POST",
+            url: "/ETLReport/GetLogReport",
+            data: { PackageGroup: packageGroup, packageName: packageName, packageStatus: packageStatus, startDate: startDate, EndDate: EndDate, PageNo: OffsetVal, RowCount: RowCount },
+            success: function (response) {
+                var LogReportDetails = $.parseJSON(response);
+               
+                BindlogReport(LogReportDetails);
+
+            },
+
+            failure: function (response) {
+            },
+            error: function (response) {
+            }
+        });
+    }
+    function preventDefaultClick() {
+        $('.hreflink').click(function (e) {
+            e.preventDefault();//prevent default click
+        });
+    }
+</script>
+<div class="container">
+    <div class="contentmaindiv">
+        <div class="etlheading">Log Report</div>
+        <div class="etlcontentdiv">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="etllabel">Package Group</div>
+                    <div class="inputtextdiv" id="divPackageroup">
+                        <select class="etltextbox" id="ddlPackageroup" onclick="this.setAttribute('value', this.value);">
+                            <option value="0">please choose...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="etllabel">Package Name</div>
+                    <div class="inputtextdiv" id="divPackageName">
+                        <select class="etltextbox" id="ddlPackageName" onclick="this.setAttribute('value', this.value);">
+                            <option value="0">please choose...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="etllabel">Package Status</div>
+                    <div class="inputtextdiv" id="divPackageStatus">
+                        <select class="etltextbox" id="ddlPackageStaus" onclick="this.setAttribute('value', this.value);">
+                            <option value="0">please choose...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="etllabel">Is Active</div>
+                    <input type="checkbox" id="chkActive">
+                </div>
+                <div class="col-md-4">
+                    <div class="etllabel">Start Date</div>
+                    <div class="inputtextdiv" id="divStartDate"><input class="etltextbox" type="text" id="dtStartDate" readonly></div>
+                </div>
+                <div class="col-md-4">
+                    <div class="etllabel">End Date</div>
+                    <div class="inputtextdiv" id="divEndDate"><input class="etltextbox" type="text" id="dtEndDate" readonly></div>
+                </div>
+
+            </div>
+        </div>
+        <div class="space"></div>
+        <div class="btndiv1">
+            <p id="pLogreport"></p>
+            <button title="Refresh" class="submitbtn" id="btnundo"><i class="fas fa-undo-alt"></i></button>
+            <button title="Generate Report" class="submitbtn" id="btnSubmit"><img src="~/Images/generate-report.png" alt="" /></button>
+        </div>
+        <div class="etlheading">Report List</div>
+        <div class="gridmaindiv">
+            <div class="gridsubdivaa" style="border: 1px solid #b7b7b7;">
+                <div class="gridsubdiv">
+                    <table width="1300px" style=" min-width: 1050px;" border="0" cellspacing="0" cellpadding="0" id="tbllogReport">
+                        <tbody>
+                            <tr>
+                                <td class="gridheader">Run Id</td>
+                                <td class="gridheader" id="trGroup">Group</td>
+                                <td class="gridheader" id="trpackage">Package</td>
+                                <td class="gridheader">Status</td>
+                                <td class="gridheader" id="trassigned">Assigned To</td>
+                                <td class="gridheader" width="13%" >Start Time</td>
+                                <td class="gridheader" width="13%">End Time</td>
+                                <td class="gridheader">Cycle Time</td>
+                                <td class="gridheader" id="trexeorder">Execution order</td>
+                                <td class="gridheader" id="trpretask">Precedent Task Id</td>
+                                <td class="gridheader" id="rowpro"> Rows Processed</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="paginationmaindiv" id="divEmailAlertPage" style="display:none; width:1300px;">
+                        <div class="paginationsubdiv">
+                            <div class="paginationbtndiv" id="FRSTbtn" title="First">
+                                <a href="#" class="hreflink"><div class="paginationfirstbtn"><i class="fa fa-angle-double-left" aria-hidden="true"></i></div></a>
+                            </div>
+                            <div class="paginationbtndiv" id="PRVbtn" title="Previous">
+                                <a href="#" class="hreflink"><div class="paginationPRVbtn"><i class="fa fa-angle-left" aria-hidden="true"></i></div></a>
+                            </div>
+                            <div class="paginationbtndiv paginationbtndivNum" id="divPgfirst">
+                                <a href="#" class="hreflink"><div name="1" class="paginationNUMbtn paginationNUMOpenbtn  paginationNUM-ACTVbtn  pagination pgNumber1">1</div></a>
+                            </div>
+                            <div class="paginationbtndiv paginationbtndivNum">
+                                <a href="#" class="hreflink"><div name="2" class="paginationNUMbtn paginationNUMOpenbtn pagination pgNumber2">2</div></a>
+                            </div>
+                            <div class="paginationbtndiv paginationbtndivNum">
+                                <a href="#" class="hreflink"><div name="3" class="paginationNUMbtn paginationNUMOpenbtn pagination pgNumber3">3</div></a>
+                            </div>
+                            <div class="paginationbtndiv paginationbtndivNum">
+                                <a href="#" class="hreflink"><div name="4" class="paginationNUMbtn paginationNUMOpenbtn pagination pgNumber4">4</div></a>
+                            </div>
+                            <div class="paginationbtndiv paginationbtndivNum" id="divPglast">
+                                <a href="#" class="hreflink"><div name="5" class="paginationNUMbtn paginationNUMOpenbtn pagination pgNumber5">5</div></a>
+                            </div>
+                            <div class="paginationbtndiv" id="NXTbtn" title="Next">
+                                <a href="#" class="hreflink"><div class="paginationNXTbtn"><i class="fa fa-angle-right" aria-hidden="true"></i></div></a>
+                            </div>
+                            <div class="paginationbtndiv" id="LSTbtn" title="Last">
+                                <a href="#" class="hreflink"><div class="paginationPRVbtn"><i class="fa fa-angle-double-right" aria-hidden="true"></i></div></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <div class="space"></div>
+
+            <div class="btndiv1">
+                <p id="pAggregateGrid"></p>
+                <button title="Export" class="submitbtn" onclick="location.href = '/ETLReport/LogExport'"><img src="~/Images/export.png" alt="" /></button>
+            </div>
+        </div>
+</div>
+
