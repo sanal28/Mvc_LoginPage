@@ -1,0 +1,48 @@
+USE [SmartSheet]
+GO
+
+/****** Object:  Table [VTwo].[TblCustomerDetails]    Script Date: 7/31/2018 9:03:58 AM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [VTwo].[TblCustomerDetails](
+	[ID_CustomerDetails] [int] IDENTITY(1,1) NOT NULL,
+	[CusFirstName] [varchar](50) NOT NULL,
+	[CusMiddleName] [varchar](10) NOT NULL,
+	[CusLastName] [varchar](50) NOT NULL,
+	[CusExcelName] [varchar](50) NOT NULL,
+	[ISDeleted] [bit] NOT NULL,
+	[EnteredDateTime] [datetimeoffset](0) NOT NULL,
+	[EntertedBy] [int] NOT NULL,
+ CONSTRAINT [PK_CustomerDetails] PRIMARY KEY CLUSTERED 
+(
+	[ID_CustomerDetails] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [VTwo].[TblCustomerDetails] ADD  CONSTRAINT [DF_TblCustomerDetails_CusFirstName]  DEFAULT ('') FOR [CusFirstName]
+GO
+
+ALTER TABLE [VTwo].[TblCustomerDetails] ADD  CONSTRAINT [DF_TblCustomerDetails_CusMiddleName]  DEFAULT ('') FOR [CusMiddleName]
+GO
+
+ALTER TABLE [VTwo].[TblCustomerDetails] ADD  CONSTRAINT [DF_TblCustomerDetails_CusLastName]  DEFAULT ('') FOR [CusLastName]
+GO
+
+ALTER TABLE [VTwo].[TblCustomerDetails] ADD  CONSTRAINT [DF_TblCustomerDetails_CusExcelName]  DEFAULT ('') FOR [CusExcelName]
+GO
+
+ALTER TABLE [VTwo].[TblCustomerDetails] ADD  CONSTRAINT [DF_TblCustomerDetails_ISDeleted]  DEFAULT ((0)) FOR [ISDeleted]
+GO
+
+ALTER TABLE [VTwo].[TblCustomerDetails] ADD  CONSTRAINT [DF_TblCustomerDetails_EnteredDateTime]  DEFAULT (sysdatetimeoffset()) FOR [EnteredDateTime]
+GO
+
+ALTER TABLE [VTwo].[TblCustomerDetails] ADD  CONSTRAINT [DF_TblCustomerDetails_EntertedBy]  DEFAULT ((0)) FOR [EntertedBy]
+GO
+
+
