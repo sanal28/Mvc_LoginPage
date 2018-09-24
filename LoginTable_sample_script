@@ -1,0 +1,46 @@
+USE [SmartSheet]
+GO
+
+/****** Object:  Table [VTwo].[TblUsers]    Script Date: 9/24/2018 12:34:51 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [VTwo].[TblUsers](
+	[ID_TblUsers] [int] IDENTITY(1,1) NOT NULL,
+	[FK_CustomerDetails] [int] NOT NULL,
+	[TUUserEmail] [varchar](50) NOT NULL,
+	[IsAdmin] [varchar](1) NULL,
+	[TUUserPassword] [varchar](50) NOT NULL,
+	[EmpProfileImagePath] [varchar](300) NOT NULL,
+	[TUClosedOn] [datetime] NULL,
+	[EnteredDateTime] [datetimeoffset](0) NOT NULL,
+	[EntertedBy] [int] NOT NULL,
+ CONSTRAINT [PK_TblUsers] PRIMARY KEY CLUSTERED 
+(
+	[ID_TblUsers] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [VTwo].[TblUsers] ADD  CONSTRAINT [DF_TblUsers_TUUserEmail]  DEFAULT ('') FOR [TUUserEmail]
+GO
+
+ALTER TABLE [VTwo].[TblUsers] ADD  CONSTRAINT [DF_TblUsers_IsAdmin]  DEFAULT ((0)) FOR [IsAdmin]
+GO
+
+ALTER TABLE [VTwo].[TblUsers] ADD  CONSTRAINT [DF_TblUsers_TUUserPassword]  DEFAULT ('') FOR [TUUserPassword]
+GO
+
+ALTER TABLE [VTwo].[TblUsers] ADD  CONSTRAINT [DF_TblUsers_EmpProfileImagePath]  DEFAULT ('') FOR [EmpProfileImagePath]
+GO
+
+ALTER TABLE [VTwo].[TblUsers] ADD  CONSTRAINT [DF_TblUsers_EnteredDateTime]  DEFAULT (sysdatetimeoffset()) FOR [EnteredDateTime]
+GO
+
+ALTER TABLE [VTwo].[TblUsers] ADD  CONSTRAINT [DF_TblUsers_EntertedBy]  DEFAULT ((0)) FOR [EntertedBy]
+GO
+
+
