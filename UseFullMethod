@@ -1,0 +1,17 @@
+1)remove all elements contained in another array
+
+https://stackoverflow.com/questions/19957348/javascript-arrays-remove-all-elements-contained-in-another-array
+
+2)Get Difference of two arrays
+
+       function differenceArray(array1, array2) {
+                var foo = [];
+                var i = 0;
+                jQuery.grep(array2, function (el) {
+
+                    if (jQuery.inArray(el, array1) == -1) foo.push(el);
+                    i++;
+
+                });
+                return foo;
+            }
