@@ -96,6 +96,8 @@ https://stackoverflow.com/questions/19957348/javascript-arrays-remove-all-elemen
         }
         
         
-       
+   4)  includes() method determines whether a string contains the characters of a specified string 
+   
+   includes doesnot support in IE use   array.indexOf("Chief Financial Officer") !== -1
         
         
