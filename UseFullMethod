@@ -100,4 +100,23 @@ https://stackoverflow.com/questions/19957348/javascript-arrays-remove-all-elemen
    
    includes doesnot support in IE use   array.indexOf("Chief Financial Officer") !== -1
         
+    5 )  convert List to XML in C#
+    in model
+     public List<MappingModel> MappingData { get; set; }
+       public class MappingModel
+    {
+        public string aa { get; set; }
+        public string aaaa { get; set; }
         
+    }
+    in .cs
+    var MappingXML = SerializeAccount(model.MappingData);
+        private string SerializeAccount(List<MappingModel> lstAccounts)
+        {
+            XmlSerializer xs = new XmlSerializer(typeof(List<MappingModel>));
+            MemoryStream ms = new MemoryStream();
+            xs.Serialize(ms, lstAccounts);
+
+            string AccountXML = UTF8Encoding.UTF8.GetString(ms.ToArray());
+            return AccountXML;
+        }
