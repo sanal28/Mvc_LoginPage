@@ -120,3 +120,14 @@ https://stackoverflow.com/questions/19957348/javascript-arrays-remove-all-elemen
             string AccountXML = UTF8Encoding.UTF8.GetString(ms.ToArray());
             return AccountXML;
         }
+        
+        6)Maximum request length exceeded.
+         <httpRuntime targetFramework="4.6.1" maxRequestLength="22000" />
+         https://stackoverflow.com/questions/3853767/maximum-request-length-exceeded
+         
+         7) 5555555555 to 55,555,555.0
+                 
+         $('.gdBudgetValue').each(function () {
+            var numValue = parseFloat(this.textContent.match(/^-?\d+(?:\.\d{0,1})?/)[0]);
+        this.textContent = numValue.toFixed(1).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+    });
