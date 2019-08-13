@@ -121,7 +121,7 @@ https://stackoverflow.com/questions/19957348/javascript-arrays-remove-all-elemen
             return AccountXML;
         }
         
-        6)Maximum request length exceeded.
+        6) Maximum request length exceeded.
          <httpRuntime targetFramework="4.6.1" maxRequestLength="22000" />
          https://stackoverflow.com/questions/3853767/maximum-request-length-exceeded
          
@@ -135,3 +135,6 @@ https://stackoverflow.com/questions/19957348/javascript-arrays-remove-all-elemen
        12,34,567.80
       this.textContent = numValue.toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, "$1,");
     
+    8) for checking select box true
+    
+     $("#PossibleServiceTypes option[value="+ServiceTypeId+"]").prop('selected', true);
