@@ -131,3 +131,7 @@ https://stackoverflow.com/questions/19957348/javascript-arrays-remove-all-elemen
             var numValue = parseFloat(this.textContent.match(/^-?\d+(?:\.\d{0,1})?/)[0]);
         this.textContent = numValue.toFixed(1).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
     });
+    
+       12,34,567.80
+      this.textContent = numValue.toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, "$1,");
+    
